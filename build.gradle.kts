@@ -3,3 +3,10 @@ plugins {
     id("com.android.application") version "8.1.4" apply false
     id("org.jetbrains.kotlin.android") version "1.9.0" apply false
 }
+
+buildscript {
+    dependencies {
+        classpath("com.android.tools.build:gradle:7.0.4")
+        classpath("com.google.dagger:hilt-android-gradle-plugin:2.38.1")
+    }
+}

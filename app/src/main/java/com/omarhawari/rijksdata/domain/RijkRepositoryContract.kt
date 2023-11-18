@@ -8,8 +8,8 @@ import com.omarhawari.rijksdata.domain.models.ArtObjectDetails
 interface RijkRepositoryContract {
 
     // Int here is Page Index
-    fun getArtObjects(pageIndex: Int, pageSize: Int): DataResult<Pair<Int, List<ArtObject>>>
+    suspend fun getArtObjects(pageIndex: Int, pageSize: Int): DataResult<Pair<Int, List<ArtObject>>>
 
-    fun getArtObjectDetails(objectName: String): DataResult<ArtObjectDetails>
+    suspend fun getArtObjectDetails(objectName: String): DataResult<ArtObjectDetails>
 
 }

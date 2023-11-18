@@ -18,7 +18,6 @@ fun ArtObjectResource.toDomain() = ArtObject(
     productionPlaces = productionPlaces
 )
 
-// Extension functions for nested classes
 fun ArtObjectResource.LinksResource.toDomain() = ArtObject.Links(self, web)
 
 fun ArtObjectResource.ImageResource.toDomain() =

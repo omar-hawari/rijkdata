@@ -10,15 +10,15 @@ import retrofit2.http.Query
 
 interface RijkApi {
 
-    @GET("/collection")
-    fun getArtObjects(
+    @GET("collection")
+    suspend fun getArtObjects(
         @Query("key") key: String = BuildConfig.API_KEY,
         @Query("p") pageIndex: Int,
         @Query("ps") pageSize: Int,
     ): ArtObjectsListResponseResource
 
-    @GET("/collection/{objectNumber}")
-    fun getArtObjectsDetails(
+    @GET("collection/{objectNumber}")
+    suspend fun getArtObjectsDetails(
         @Path("objectNumber") objectNumber: String,
         @Query("key") key: String = BuildConfig.API_KEY,
     ): ArtObjectDetailsResponseResource

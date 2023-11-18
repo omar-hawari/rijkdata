@@ -53,7 +53,6 @@ fun ArtObjectDetailsResource.toDomain() = ArtObjectDetails(
 )
 
 
-// Similar extension functions for nested classes
 fun ArtObjectDetailsResource.LinksResource.toDomain() = ArtObjectDetails.Links(search)
 
 fun ArtObjectDetailsResource.DimensionResource.toDomain() =

@@ -10,17 +10,40 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
-import com.omarhawari.rijksdata.BuildConfig
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
+import com.omarhawari.rijksdata.presentation.art_object_details.ArtObjectDetails
+import com.omarhawari.rijksdata.presentation.art_objects_list.ArtObjectList
 import com.omarhawari.rijksdata.theme.MyApplicationTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
-                // A surface container using the 'background' color from the theme
-                Surface(modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background) {
-                    Greeting(BuildConfig.API_KEY)
+
+
+                Surface(
+                    modifier = Modifier.fillMaxSize(),
+                    color = MaterialTheme.colorScheme.background
+                ) {
+                    val navController = rememberNavController()
+                    NavHost(
+                        navController = navController,
+                        startDestination = Screen.ArtObjectsListScreen.route
+                    ) {
+                        composable(route = Screen.ArtObjectsListScreen.route) {
+                            ArtObjectList(navController = navController)
+                        }
+                        composable(
+                            route = Screen.ArtObjectDetailsScreen.route + "/{${PARAM_OBJECT_NUMBER}}"
+                        ) {
+                            ArtObjectDetails(navController = navController)
+                        }
+                    }
                 }
             }
         }

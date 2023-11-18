@@ -4,8 +4,8 @@ import android.provider.ContactsContract.Data
 import java.lang.Exception
 
 sealed class DataResult<out R> {
-    class Success<T>(response: T) : DataResult<T>()
-    class Failure(exception: Exception) : DataResult<Nothing>()
+    class Success<T>(val response: T) : DataResult<T>()
+    class Failure(val exception: Exception) : DataResult<Nothing>()
 }
 
 inline fun <R> asDataResult(block: () -> R): DataResult<R> {

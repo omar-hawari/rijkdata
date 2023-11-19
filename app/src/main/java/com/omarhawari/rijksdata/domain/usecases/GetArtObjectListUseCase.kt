@@ -9,7 +9,12 @@ class GetArtObjectListUseCase @Inject constructor(private val repository: RijkRe
 
     suspend operator fun invoke(
         pageIndex: Int,
-        pageSize: Int
-    ) = repository.getArtObjects(pageIndex, pageSize)
+        pageSize: Int,
+        sortBy: String?
+    ) = repository.getArtObjects(pageIndex, pageSize, sortBy)
+
+    companion object {
+        const val SORT_BY_ARTIST = "artist"
+    }
 
 }

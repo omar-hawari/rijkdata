@@ -15,6 +15,7 @@ interface RijkApi {
         @Query("key") key: String = BuildConfig.API_KEY,
         @Query("p") pageIndex: Int,
         @Query("ps") pageSize: Int,
+        @Query("s") sortBy: String?
     ): ArtObjectsListResponseResource
 
     @GET("collection/{objectNumber}")

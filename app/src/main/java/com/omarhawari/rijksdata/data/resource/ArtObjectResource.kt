@@ -13,8 +13,8 @@ data class ArtObjectResource(
     val longTitle: String,
     val showImage: Boolean,
     val permitDownload: Boolean,
-    val webImage: ImageResource,
-    val headerImage: ImageResource,
+    val webImage: ImageResource?,
+    val headerImage: ImageResource?,
     val productionPlaces: List<String>
 ) {
     data class LinksResource(
@@ -23,7 +23,7 @@ data class ArtObjectResource(
     )
 
     data class ImageResource(
-        val guid: String,
+        val guid: String?,
         val offsetPercentageX: Int,
         val offsetPercentageY: Int,
         val width: Int,

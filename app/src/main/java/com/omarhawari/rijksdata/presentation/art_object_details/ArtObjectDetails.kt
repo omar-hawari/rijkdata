@@ -13,6 +13,5 @@ fun ArtObjectDetails(
     viewModel: ArtObjectDetailsViewModel = hiltViewModel()
 ) {
 
-    Text(text = viewModel.artObjectId)
 
 }

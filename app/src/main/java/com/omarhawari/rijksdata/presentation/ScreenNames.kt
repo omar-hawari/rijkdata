@@ -6,4 +6,3 @@ sealed class Screen(val route: String) {
 }
 
 const val PARAM_OBJECT_NUMBER = "objectNumber"
-

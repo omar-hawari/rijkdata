@@ -13,12 +13,13 @@ fun ArtObjectResource.toDomain() = ArtObject(
     longTitle = longTitle,
     showImage = showImage,
     permitDownload = permitDownload,
-    webImage = webImage.toDomain(),
-    headerImage = headerImage.toDomain(),
+    webImage = webImage?.toDomain(),
+    headerImage = headerImage?.toDomain(),
     productionPlaces = productionPlaces
 )
 
 fun ArtObjectResource.LinksResource.toDomain() = ArtObject.Links(self, web)
 
-fun ArtObjectResource.ImageResource.toDomain() =
+fun ArtObjectResource.ImageResource.toDomain() = if (guid != null) {
     ArtObject.Image(guid, offsetPercentageX, offsetPercentageY, width, height, url)
+} else null

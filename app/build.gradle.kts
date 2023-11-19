@@ -16,7 +16,7 @@ android {
         versionCode = 1
         versionName = "1.0"
 
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner = "com.omarhawari.rijksdata.CustomTestRunner"
 
         vectorDrawables {
             useSupportLibrary = true
@@ -40,8 +40,7 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
             )
 
             buildConfigField("String", "API_KEY", "\"${project.findProperty("API_KEY_RELEASE")}\"")
@@ -79,6 +78,16 @@ dependencies {
     androidTestImplementation("androidx.test.espresso:espresso-core:3.5.1")
     androidTestImplementation(platform("androidx.compose:compose-bom:2023.03.00"))
     androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+
+    testImplementation("com.google.dagger:hilt-android-testing:2.44")
+    kaptTest("com.google.dagger:hilt-android-testing:2.44")
+    testAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.48")
+
+    androidTestImplementation("com.google.dagger:hilt-android-testing:2.44")
+    kaptAndroidTest("com.google.dagger:hilt-android-compiler:2.48")
+    androidTestAnnotationProcessor("com.google.dagger:hilt-android-compiler:2.48")
+
+
     debugImplementation("androidx.compose.ui:ui-tooling")
     debugImplementation("androidx.compose.ui:ui-test-manifest")
 
@@ -96,5 +105,7 @@ dependencies {
     kapt("androidx.hilt:hilt-compiler:1.1.0")
 
     implementation("com.google.accompanist:accompanist-swiperefresh:0.27.0")
+
+    implementation("io.coil-kt:coil-compose:2.0.0-rc01")
 
 }

@@ -6,16 +6,17 @@ import com.omarhawari.rijksdata.domain.mappers.toDomain
 import javax.inject.Inject
 
 class RijkRepositoryNetwork @Inject constructor(private val api: RijkApi) : RijkRepositoryContract {
-    override suspend fun getArtObjects(pageIndex: Int, pageSize: Int) = asDataResult {
+    override suspend fun getArtObjects(pageIndex: Int, pageSize: Int, sortBy: String?) = asDataResult {
         Pair(
             pageIndex,
             api.getArtObjects(
                 pageIndex = pageIndex,
-                pageSize = pageSize
+                pageSize = pageSize,
+                sortBy = sortBy
             ).artObjects.map { it.toDomain() })
     }
 
-    override suspend fun getArtObjectDetails(objectName: String) = asDataResult {
-        api.getArtObjectsDetails(objectName).artObject.toDomain()
+    override suspend fun getArtObjectDetails(objectNumber: String) = asDataResult {
+        api.getArtObjectsDetails(objectNumber).artObject.toDomain()
     }
 }

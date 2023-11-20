@@ -1,5 +1,6 @@
 package com.omarhawari.rijksdata.presentation.art_object_details
 
+import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -8,7 +9,6 @@ import com.omarhawari.rijksdata.domain.models.ArtObjectDetails
 import com.omarhawari.rijksdata.domain.usecases.GetArtObjectDetailsUseCase
 import com.omarhawari.rijksdata.presentation.PARAM_OBJECT_NUMBER
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -18,7 +18,7 @@ class ArtObjectDetailsViewModel @Inject constructor(
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    val viewState = MutableStateFlow<ViewState>(ViewState.Loading)
+    val viewState = mutableStateOf<ViewState>(ViewState.Loading)
 
     private val artObjectNumber: String
 
@@ -28,11 +28,14 @@ class ArtObjectDetailsViewModel @Inject constructor(
     }
 
     fun getObjectDetails() {
-        viewState.value = ViewState.Loading
         viewModelScope.launch {
+            viewState.value = ViewState.Loading
             viewState.value =
                 when (val result = getArtObjectDetailsUseCase(objectNumber = artObjectNumber)) {
-                    is DataResult.Failure -> ViewState.Error(result.exception)
+                    is DataResult.Failure -> {
+                        result.exception.printStackTrace()
+                        ViewState.Error(result.exception)
+                    }
                     is DataResult.Success -> ViewState.Content(result.response)
                 }
         }

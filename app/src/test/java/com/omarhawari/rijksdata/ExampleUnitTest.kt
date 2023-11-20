@@ -1,17 +1,35 @@
 package com.omarhawari.rijksdata
 
+import com.omarhawari.rijksdata.core.DataResult
+import com.omarhawari.rijksdata.core.asDataResult
+import com.omarhawari.rijksdata.data.RijkRepositoryNetwork
+import com.omarhawari.rijksdata.domain.usecases.GetArtObjectListUseCase
+import io.mockk.mockk
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
+import org.junit.Assert.assertEquals
 import org.junit.Test
 
-import org.junit.Assert.*
+@ExperimentalCoroutinesApi
+class GetArtObjectsListUseCaseUnitTest {
 
-/**
- * Example local unit test, which will execute on the development machine (host).
- *
- * See [testing documentation](http://d.android.com/tools/testing).
- */
-class ExampleUnitTest {
     @Test
-    fun addition_isCorrect() {
-        assertEquals(4, 2 + 2)
+    fun `execute with non-empty data should return success result`() = runTest {
+
+        val repoMock = mockk<RijkRepositoryNetwork> {
+        }
+
+        val getArtObjectListUseCase = GetArtObjectListUseCase(repoMock)
+
+        assertEquals(getArtObjectListUseCase(0, 10, "artist"), asDataResult {
+            Pair(
+                0, listOf(
+                    TestData.artObject, TestData.artObject
+                )
+            )
+        })
+
     }
+
+
 }

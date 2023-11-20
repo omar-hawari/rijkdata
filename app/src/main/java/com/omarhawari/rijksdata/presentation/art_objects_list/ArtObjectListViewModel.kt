@@ -1,5 +1,8 @@
 package com.omarhawari.rijksdata.presentation.art_objects_list
 
+import android.util.Log
+import androidx.compose.runtime.mutableStateOf
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.omarhawari.rijksdata.core.DataResult
@@ -15,7 +18,9 @@ import javax.inject.Inject
 class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUseCase: GetArtObjectListUseCase) :
     ViewModel() {
 
-    val viewState = MutableStateFlow<ViewState>(ViewState.LoadingFullScreen)
+    val actions = MutableStateFlow<Action?>(Action.NoAction)
+
+    val viewState = mutableStateOf<ViewState>(ViewState.Init)
 
     private val artObjects = arrayListOf<ArtObject>()
     private val sectionedArtObjects = arrayListOf<SectionedArtObject>()
@@ -25,22 +30,42 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
     }
 
     fun getArtObjectList(pageIndex: Int, pageSize: Int = 10) {
-
-        if (pageIndex == 0)
-            viewState.value = ViewState.LoadingFullScreen
-        else
-            viewState.value =
-                (viewState.value as ViewState.Content).copy(isPaginationLoading = true)
-
         viewModelScope.launch {
+
+            if (pageIndex == 0)
+                actions.emit(Action.LoadingFullScreen)
+            else
+                viewState.value =
+                    (viewState.value as ViewState.Content).copy(isPaginationLoading = true)
+
             viewState.value =
                 when (val result = getArtObjectListUseCase(pageIndex, pageSize, SORT_BY_ARTIST)) {
                     is DataResult.Failure -> {
-                        result.exception.printStackTrace()
-                        ViewState.Error(result.exception)
+                        // If the error happens when the user is refreshing and/or the app just launched for the first time,
+                        // the error view will be fullscreen, thus the "ViewState" will be ErrorFullScreen
+                        if (pageIndex == 0 && sectionedArtObjects.isEmpty()) {
+                            // Clears the progress indicator
+                            actions.emit(Action.NoAction)
+
+                            ViewState.ErrorFullScreen(result.exception)
+                        }
+                        // If the error happens when the user is just scrolling through the list, the user will still be able to view the already
+                        // loaded list, but an error SnackBar/Toast should be displayed, which is why the actions flow will emit a new Error object.
+                        else {
+                            actions.emit(Action.Error(result.exception))
+
+                            ViewState.Content(
+                                pageIndex = pageIndex,
+                                list = sectionedArtObjects,
+                                isPaginationLoading = false
+                            )
+                        }
                     }
 
                     is DataResult.Success -> {
+                        // Clears the progress indicator
+                        actions.emit(Action.NoAction)
+
                         addArtObjectsIntoSections(pageIndex, result.response.second)
                         ViewState.Content(
                             pageIndex = result.response.first,
@@ -73,8 +98,15 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
             val list: List<SectionedArtObject>
         ) : ViewState()
 
-        class Error(val exception: Exception) : ViewState()
-        data object LoadingFullScreen : ViewState()
+        class ErrorFullScreen(val exception: Exception) : ViewState()
+
+        data object Init : ViewState()
+    }
+
+    sealed class Action {
+        class Error(val exception: Exception) : Action()
+        data object LoadingFullScreen : Action()
+        data object NoAction : Action()
     }
 
 }

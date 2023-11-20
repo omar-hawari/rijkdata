@@ -4,6 +4,7 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -13,33 +14,34 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.omarhawari.rijksdata.presentation.art_object_details.ArtObjectDetails
-import com.omarhawari.rijksdata.presentation.art_objects_list.ArtObjectList
+import com.omarhawari.rijksdata.presentation.art_object_details.ArtObjectDetailsView
+import com.omarhawari.rijksdata.presentation.art_objects_list.ArtObjectListView
 import com.omarhawari.rijksdata.theme.MyApplicationTheme
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @OptIn(ExperimentalMaterial3Api::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
             MyApplicationTheme {
                 Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
+                    modifier = Modifier.fillMaxSize(), color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
+
                     NavHost(
                         navController = navController,
-                        startDestination = Screen.ArtObjectsListScreen.route
+                        startDestination = Screen.ArtObjectsListScreen.route,
                     ) {
                         composable(route = Screen.ArtObjectsListScreen.route) {
-                            ArtObjectList(navController = navController)
+                            ArtObjectListView(navController = navController)
                         }
                         composable(
                             route = Screen.ArtObjectDetailsScreen.route + "/{${PARAM_OBJECT_NUMBER}}"
                         ) {
-                            ArtObjectDetails(navController = navController)
+                            ArtObjectDetailsView(navController = navController)
                         }
                     }
                 }
@@ -51,8 +53,7 @@ class MainActivity : ComponentActivity() {
 @Composable
 fun Greeting(name: String, modifier: Modifier = Modifier) {
     Text(
-        text = "Hello $name!",
-        modifier = modifier
+        text = "Hello $name!", modifier = modifier
     )
 }
 

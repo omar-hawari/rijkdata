@@ -9,20 +9,16 @@ data class ArtObjectDetails(
     val language: String,
     val title: String,
     val copyrightHolder: String?,
-    val webImage: Image,
-    val colors: List<Color>,
-    val colorsWithNormalization: List<ColorNormalization>,
-    val normalizedColors: List<Color>,
-    val normalized32Colors: List<Color>,
+    val webImage: Image?,
     val titles: List<String>,
-    val description: String,
+    val description: String?,
     val labelText: String?,
     val objectTypes: List<String>,
     val objectCollection: List<String>,
-    val makers: List<String>,
-    val principalMakers: List<PrincipalMaker>,
-    val plaqueDescriptionDutch: String,
-    val plaqueDescriptionEnglish: String,
+    val makers: List<Maker>,
+    val principalMakers: List<Maker>,
+    val plaqueDescriptionDutch: String?,
+    val plaqueDescriptionEnglish: String?,
     val principalMaker: String,
     val artistRole: String?,
     val associations: List<String>,
@@ -47,7 +43,7 @@ data class ArtObjectDetails(
     val scLabelLine: String,
     val label: Label,
     val showImage: Boolean,
-    val location: String
+    val location: String?
 ) {
 
     data class Links(
@@ -71,17 +67,17 @@ data class ArtObjectDetails(
     )
 
     data class Label(
-        val title: String,
-        val makerLine: String,
-        val description: String,
-        val notes: String,
-        val date: String
+        val title: String?,
+        val makerLine: String?,
+        val description: String?,
+        val notes: String?,
+        val date: String?
     )
 
     data class Acquisition(
         val method: String,
         val date: String,
-        val creditLine: String
+        val creditLine: String?
     )
 
     data class Color(
@@ -106,20 +102,20 @@ data class ArtObjectDetails(
         val iconClassIdentifier: List<String>
     )
 
-    data class PrincipalMaker(
-        val name: String,
-        val unFixedName: String,
-        val placeOfBirth: String,
-        val dateOfBirth: String,
+    data class Maker(
+        val name: String?,
+        val unFixedName: String?,
+        val placeOfBirth: String?,
+        val dateOfBirth: String?,
         val dateOfBirthPrecision: String?,
-        val dateOfDeath: String,
+        val dateOfDeath: String?,
         val dateOfDeathPrecision: String?,
-        val placeOfDeath: String,
-        val occupation: List<String>,
-        val roles: List<String>,
-        val nationality: String,
+        val placeOfDeath: String?,
+        val occupation: List<String>?,
+        val roles: List<String>?,
+        val nationality: String?,
         val biography: String?,
-        val productionPlaces: List<String>,
+        val productionPlaces: List<String>?,
         val qualification: String?
     )
 

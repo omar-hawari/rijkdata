@@ -11,17 +11,13 @@ fun ArtObjectDetailsResource.toDomain() = ArtObjectDetails(
     language = language,
     title = title,
     copyrightHolder = copyrightHolder,
-    webImage = webImage.toDomain(),
-    colors = colors.map { it.toDomain() },
-    colorsWithNormalization = colorsWithNormalization.map { it.toDomain() },
-    normalizedColors = normalizedColors.map { it.toDomain() },
-    normalized32Colors = normalized32Colors.map { it.toDomain() },
+    webImage = webImage?.toDomain(),
     titles = titles,
     description = description,
     labelText = labelText,
     objectTypes = objectTypes,
     objectCollection = objectCollection,
-    makers = makers,
+    makers = makers.map { it.toDomain() },
     principalMakers = principalMakers.map { it.toDomain() },
     plaqueDescriptionDutch = plaqueDescriptionDutch,
     plaqueDescriptionEnglish = plaqueDescriptionEnglish,
@@ -65,15 +61,11 @@ fun ArtObjectDetailsResource.LabelResource.toDomain() = ArtObjectDetails.Label(t
 
 fun ArtObjectDetailsResource.AcquisitionResource.toDomain() = ArtObjectDetails.Acquisition(method, date, creditLine)
 
-fun ArtObjectDetailsResource.ColorResource.toDomain() = ArtObjectDetails.Color(percentage, hex)
-
-fun ArtObjectDetailsResource.ColorNormalizationResource.toDomain() = ArtObjectDetails.ColorNormalization(originalHex, normalizedHex)
-
 fun ArtObjectDetailsResource.DatingResource.toDomain() = ArtObjectDetails.Dating(presentingDate, sortingDate, period, yearEarly, yearLate)
 
 fun ArtObjectDetailsResource.ClassificationResource.toDomain() = ArtObjectDetails.Classification(iconClassIdentifier)
 
-fun ArtObjectDetailsResource.PrincipalMakerResource.toDomain() = ArtObjectDetails.PrincipalMaker(
+fun ArtObjectDetailsResource.MakerResource.toDomain() = ArtObjectDetails.Maker(
     name, unFixedName, placeOfBirth, dateOfBirth, dateOfBirthPrecision, dateOfDeath,
     dateOfDeathPrecision, placeOfDeath, occupation, roles, nationality, biography,
     productionPlaces, qualification

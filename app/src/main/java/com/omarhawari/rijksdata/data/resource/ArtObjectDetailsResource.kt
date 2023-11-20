@@ -9,20 +9,20 @@ data class ArtObjectDetailsResource(
     val language: String,
     val title: String,
     val copyrightHolder: String?,
-    val webImage: ImageResource,
+    val webImage: ImageResource?,
     val colors: List<ColorResource>,
     val colorsWithNormalization: List<ColorNormalizationResource>,
     val normalizedColors: List<ColorResource>,
     val normalized32Colors: List<ColorResource>,
     val titles: List<String>,
-    val description: String,
+    val description: String?,
     val labelText: String?,
     val objectTypes: List<String>,
     val objectCollection: List<String>,
-    val makers: List<String>,
-    val principalMakers: List<PrincipalMakerResource>,
-    val plaqueDescriptionDutch: String,
-    val plaqueDescriptionEnglish: String,
+    val makers: List<MakerResource>,
+    val principalMakers: List<MakerResource>,
+    val plaqueDescriptionDutch: String?,
+    val plaqueDescriptionEnglish: String?,
     val principalMaker: String,
     val artistRole: String?,
     val associations: List<String>,
@@ -47,7 +47,7 @@ data class ArtObjectDetailsResource(
     val scLabelLine: String,
     val label: LabelResource,
     val showImage: Boolean,
-    val location: String
+    val location: String?
 ) {
 
     data class LinksResource(
@@ -71,17 +71,17 @@ data class ArtObjectDetailsResource(
     )
 
     data class LabelResource(
-        val title: String,
-        val makerLine: String,
-        val description: String,
-        val notes: String,
-        val date: String
+        val title: String?,
+        val makerLine: String?,
+        val description: String?,
+        val notes: String?,
+        val date: String?
     )
 
     data class AcquisitionResource(
         val method: String,
         val date: String,
-        val creditLine: String
+        val creditLine: String?
     )
 
     data class ColorResource(
@@ -106,20 +106,20 @@ data class ArtObjectDetailsResource(
         val iconClassIdentifier: List<String>
     )
 
-    data class PrincipalMakerResource(
-        val name: String,
-        val unFixedName: String,
-        val placeOfBirth: String,
-        val dateOfBirth: String,
+    data class MakerResource(
+        val name: String?,
+        val unFixedName: String?,
+        val placeOfBirth: String?,
+        val dateOfBirth: String?,
         val dateOfBirthPrecision: String?,
-        val dateOfDeath: String,
+        val dateOfDeath: String?,
         val dateOfDeathPrecision: String?,
-        val placeOfDeath: String,
-        val occupation: List<String>,
-        val roles: List<String>,
-        val nationality: String,
+        val placeOfDeath: String?,
+        val occupation: List<String>?,
+        val roles: List<String>?,
+        val nationality: String?,
         val biography: String?,
-        val productionPlaces: List<String>,
+        val productionPlaces: List<String>?,
         val qualification: String?
     )
 

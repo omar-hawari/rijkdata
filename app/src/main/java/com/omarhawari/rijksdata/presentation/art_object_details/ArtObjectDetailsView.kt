@@ -35,6 +35,7 @@ import androidx.navigation.NavController
 import coil.compose.SubcomposeAsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
+import com.omarhawari.rijksdata.presentation.components.ErrorComponent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -100,8 +101,9 @@ fun ArtObjectDetailsView(
                             val scale = remember { mutableStateOf(1f) }
 
                             val state =
-                                rememberTransformableState { zoomChange, panChange, _ ->
-                                    scale.value = (scale.value * zoomChange).coerceIn(1f, 5f)
+                                rememberTransformableState { scaleChange, _, _ ->
+                                    // Scale values are captured here, this could be improved with providing the user the ability to zoom in from a specific offset.
+                                    scale.value = (scale.value * scaleChange).coerceIn(1f, 5f)
                                 }
 
                             SubcomposeAsyncImage(
@@ -119,6 +121,7 @@ fun ArtObjectDetailsView(
                                 contentScale = ContentScale.Crop,
                                 modifier = Modifier
                                     .height(250.dp)
+                                    // Here the scale values are applied, which zooms in the photo.
                                     .graphicsLayer(
                                         scaleX = scale.value,
                                         scaleY = scale.value,
@@ -132,14 +135,17 @@ fun ArtObjectDetailsView(
                                 key = "Date:",
                                 value = artObjectDetails.dating.presentingDate
                             )
-
-
                         }
                     }
                 }
 
                 is ArtObjectDetailsViewModel.ViewState.Error -> {
-
+                    ErrorComponent(
+                        modifier = Modifier.fillMaxSize(),
+                        (viewState.value as ArtObjectDetailsViewModel.ViewState.Error).exception,
+                        onRefresh = {
+                            viewModel.getObjectDetails()
+                        })
                 }
 
                 ArtObjectDetailsViewModel.ViewState.Loading -> {

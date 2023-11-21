@@ -123,8 +123,11 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
     }
 
     sealed class Action {
+        // This error is different that ViewState.ErrorFullScreen, as it will only show a Toast
         class Error(val exception: Exception) : Action()
         data object LoadingFullScreen : Action()
+
+        // Blank action to clear whatever came before it.
         data object NoAction : Action()
     }
 

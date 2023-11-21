@@ -13,10 +13,14 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -24,6 +28,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,13 +61,17 @@ fun ArtObjectListView(
     viewModel: ArtObjectListViewModel = hiltViewModel()
 ) {
 
-    val coroutineScope = rememberCoroutineScope()
+    // This state is used to determine if the alert dialog is shown or not.
+    val openAlertDialog = remember { mutableStateOf(false) }
 
-    val action = viewModel.actions.collectAsState()
+    // Used to scroll to the last item of the list.
+    val coroutineScope = rememberCoroutineScope()
 
     val swipeRefreshState = rememberSwipeRefreshState(false)
 
     val viewState = viewModel.viewState
+
+    val action = viewModel.actions.collectAsState()
 
     Scaffold(
         topBar = {
@@ -74,16 +84,29 @@ fun ArtObjectListView(
                         style = MaterialTheme.typography.titleLarge.copy(color = Color.White)
                     )
                 },
+                actions = {
+                    IconButton(onClick = {
+                        // Setting this state to true shows the dialog.
+                        openAlertDialog.value = true
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.List,
+                            contentDescription = "Sort by",
+                            tint = Color.White
+                        )
+                    }
+                }
             )
-        }
-    ) {
-        SwipeRefresh(state = swipeRefreshState, onRefresh = {
-            viewModel.getArtObjectList(
-                0
-            )
-        }, modifier = modifier
-            .fillMaxHeight()
-            .padding(it)) {
+        },
+
+        ) { paddingValues ->
+        SwipeRefresh(
+            state = swipeRefreshState, onRefresh = {
+                viewModel.refresh()
+            }, modifier = modifier
+                .fillMaxHeight()
+                .padding(paddingValues)
+        ) {
 
             when (viewState.value) {
                 is ArtObjectListViewModel.ViewState.Content -> {
@@ -114,7 +137,7 @@ fun ArtObjectListView(
                                                 )
                                                 .padding(vertical = 16.dp),
                                             textAlign = TextAlign.Center,
-                                            style = TextStyle(fontSize = 20.sp)
+                                            style = TextStyle(fontSize = 20.sp, color = Color.White)
                                         )
                                     }
                                 }
@@ -134,6 +157,7 @@ fun ArtObjectListView(
                             }
                         }
 
+                        // If there's pagination loading, add an additional item with a progress indicator.
                         if (content.isPaginationLoading) {
                             item(span = {
                                 GridItemSpan(2)
@@ -149,12 +173,18 @@ fun ArtObjectListView(
                             }
                         }
 
-                        if (!state.canScrollForward && content.isPaginationLoading) {
-                            coroutineScope.launch {
-                                state.scrollToItem(content.list.size)
+                        if (!state.canScrollForward) {
+                            // In order to show the progress indicator when it's visible the list scrolls to its last item when the user reaches the final item and pagination is started.
+                            if (content.isPaginationLoading) {
+                                coroutineScope.launch {
+                                    state.scrollToItem(content.list.size)
+                                }
                             }
-                        } else if (!state.canScrollForward) {
-                            viewModel.getArtObjectList(pageIndex = content.pageIndex + 1)
+                            // Otherwise, initiate pagination with {content.pageIndex + 1}
+                            else {
+                                viewModel.paginate(pageIndex = content.pageIndex + 1)
+                            }
+
                         }
                     }
 
@@ -173,16 +203,27 @@ fun ArtObjectListView(
                         modifier = Modifier.fillMaxSize(),
                         (viewState.value as ArtObjectListViewModel.ViewState.ErrorFullScreen).exception,
                         onRefresh = {
-                            viewModel.getArtObjectList(pageIndex = 0)
+                            viewModel.refresh()
                         })
                 }
 
                 ArtObjectListViewModel.ViewState.Init -> {
-                    // Fill the screen in order for the swipe refresh layout to be able to show the progress indicator
+                    // Fill the screen in order for the swipe refresh layout to be able to show the progress indicator of the SwipeRefresh component.
                     Box(modifier = Modifier.fillMaxSize())
                 }
             }
         }
+
+        if (openAlertDialog.value)
+            SortByDialog(
+                currentOption = viewModel.sortBy.value,
+                onDismiss = {
+                    openAlertDialog.value = false
+                }, onSelect = {
+                    viewModel.sortBy.value = it
+                    viewModel.refresh()
+                    openAlertDialog.value = false
+                })
 
     }
 

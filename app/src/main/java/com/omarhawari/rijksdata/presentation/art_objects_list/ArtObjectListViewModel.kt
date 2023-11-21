@@ -1,14 +1,11 @@
 package com.omarhawari.rijksdata.presentation.art_objects_list
 
-import android.util.Log
 import androidx.compose.runtime.mutableStateOf
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.omarhawari.rijksdata.core.DataResult
 import com.omarhawari.rijksdata.domain.models.ArtObject
 import com.omarhawari.rijksdata.domain.usecases.GetArtObjectListUseCase
-import com.omarhawari.rijksdata.domain.usecases.GetArtObjectListUseCase.Companion.SORT_BY_ARTIST
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
@@ -22,14 +19,24 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
 
     val viewState = mutableStateOf<ViewState>(ViewState.Init)
 
+    val sortBy = mutableStateOf(SortBy.ARTIST)
+
     private val artObjects = arrayListOf<ArtObject>()
     private val sectionedArtObjects = arrayListOf<SectionedArtObject>()
 
     init {
+        refresh()
+    }
+
+    fun refresh() {
         getArtObjectList(0)
     }
 
-    fun getArtObjectList(pageIndex: Int, pageSize: Int = 10) {
+    fun paginate(pageIndex: Int) {
+        getArtObjectList(pageIndex)
+    }
+
+    private fun getArtObjectList(pageIndex: Int, pageSize: Int = 10) {
         viewModelScope.launch {
 
             if (pageIndex == 0)
@@ -39,7 +46,7 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
                     (viewState.value as ViewState.Content).copy(isPaginationLoading = true)
 
             viewState.value =
-                when (val result = getArtObjectListUseCase(pageIndex, pageSize, SORT_BY_ARTIST)) {
+                when (val result = getArtObjectListUseCase(pageIndex, pageSize, sortBy.value)) {
                     is DataResult.Failure -> {
                         // If the error happens when the user is refreshing and/or the app just launched for the first time,
                         // the error view will be fullscreen, thus the "ViewState" will be ErrorFullScreen
@@ -82,8 +89,11 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
 
         addedArtObjects.forEach { artObject ->
             // If the current item's artist name is different, or this is the first item (which guarantees it's a new artist name), add a new section header.
+
+            // Additionally, only add headers if the results are grouped by artists.
             if (this.artObjects.isEmpty() || artObject.principalOrFirstMaker != this.artObjects.last().principalOrFirstMaker) {
-                sectionedArtObjects.add(SectionedArtObject.ListHeader(artObject.principalOrFirstMaker))
+                if (listOf(SortBy.ARTIST, SortBy.ARTIST_DESC).contains(sortBy.value))
+                    sectionedArtObjects.add(SectionedArtObject.ListHeader(artObject.principalOrFirstMaker))
             }
             sectionedArtObjects.add(SectionedArtObject.ListItem(artObject = artObject))
             artObjects.add(artObject)
@@ -107,6 +117,15 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
         class Error(val exception: Exception) : Action()
         data object LoadingFullScreen : Action()
         data object NoAction : Action()
+    }
+
+    enum class SortBy {
+        ARTIST,
+        ARTIST_DESC,
+        RELEVANCE,
+        OBJECT_TYPE,
+        CHRONOLOGIC,
+        ACHRONOLOGIC,
     }
 
 }

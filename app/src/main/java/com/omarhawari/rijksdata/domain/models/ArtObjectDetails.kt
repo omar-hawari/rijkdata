@@ -57,7 +57,8 @@ data class ArtObjectDetails(
         val value: String
     )
 
-    data class Image(
+    data class
+    Image(
         val guid: String,
         val offsetPercentageX: Int,
         val offsetPercentageY: Int,

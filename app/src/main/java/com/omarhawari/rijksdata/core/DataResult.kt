@@ -1,8 +1,5 @@
 package com.omarhawari.rijksdata.core
 
-import android.provider.ContactsContract.Data
-import java.lang.Exception
-
 sealed class DataResult<out R> {
     class Success<T>(val response: T) : DataResult<T>()
     class Failure(val exception: Exception) : DataResult<Nothing>()

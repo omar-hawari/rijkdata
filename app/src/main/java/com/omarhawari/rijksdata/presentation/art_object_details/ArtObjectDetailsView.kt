@@ -1,8 +1,13 @@
 package com.omarhawari.rijksdata.presentation.art_object_details
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.rememberTransformableState
+import androidx.compose.foundation.gestures.transformable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -21,10 +26,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.style.LineBreak
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import coil.compose.SubcomposeAsyncImage
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 
@@ -44,6 +52,7 @@ fun ArtObjectDetailsView(
         rememberSwipeRefreshState(isRefreshing = viewState.value is ArtObjectDetailsViewModel.ViewState.Loading)
 
     Scaffold(
+        modifier = modifier,
         topBar = {
             TopAppBar(
                 modifier = Modifier.background(Color.Black),
@@ -79,9 +88,54 @@ fun ArtObjectDetailsView(
             ) {
             when (viewState.value) {
                 is ArtObjectDetailsViewModel.ViewState.Content -> {
+
+                    val artObjectDetails =
+                        (viewState.value as ArtObjectDetailsViewModel.ViewState.Content).artObjectDetails
+
                     title.value =
-                        (viewState.value as ArtObjectDetailsViewModel.ViewState.Content).artObjectDetails.title
-                    Text(text = title.value, modifier = Modifier.fillMaxSize())
+                        artObjectDetails.title
+                    Column {
+                        artObjectDetails.webImage?.let {
+
+                            val scale = remember { mutableStateOf(1f) }
+
+                            val state =
+                                rememberTransformableState { zoomChange, panChange, _ ->
+                                    scale.value = (scale.value * zoomChange).coerceIn(1f, 5f)
+                                }
+
+                            SubcomposeAsyncImage(
+                                model = artObjectDetails.webImage.url,
+                                contentDescription = null,
+                                loading = {
+                                    Box(modifier = Modifier.fillMaxSize()) {
+                                        CircularProgressIndicator(
+                                            modifier = Modifier.align(
+                                                Alignment.Center
+                                            )
+                                        )
+                                    }
+                                },
+                                contentScale = ContentScale.Crop,
+                                modifier = Modifier
+                                    .height(250.dp)
+                                    .graphicsLayer(
+                                        scaleX = scale.value,
+                                        scaleY = scale.value,
+                                    )
+                                    .transformable(state = state)
+                            )
+
+                            DetailsRow(key = "Artist:", value = artObjectDetails.principalMaker)
+
+                            DetailsRow(
+                                key = "Date:",
+                                value = artObjectDetails.dating.presentingDate
+                            )
+
+
+                        }
+                    }
                 }
 
                 is ArtObjectDetailsViewModel.ViewState.Error -> {
@@ -95,5 +149,25 @@ fun ArtObjectDetailsView(
                 }
             }
         }
+    }
+
+}
+
+@Composable
+fun DetailsRow(modifier: Modifier = Modifier, key: String, value: String) {
+    Row(modifier) {
+
+        Text(
+            text = key, modifier = Modifier
+                .padding(8.dp)
+                .weight(1f)
+        )
+
+        Text(
+            text = value, modifier = Modifier
+                .padding(8.dp)
+                .weight(1f)
+        )
+
     }
 }

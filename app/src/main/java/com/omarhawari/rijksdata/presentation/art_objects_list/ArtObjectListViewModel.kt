@@ -21,6 +21,8 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
 
     val sortBy = mutableStateOf(SortBy.ARTIST)
 
+    // The API can return duplicated results, so putting the ids in a set will help weed out the replicated instances.
+    private val artObjectsIds = mutableSetOf<String>()
     private val artObjects = arrayListOf<ArtObject>()
     private val sectionedArtObjects = arrayListOf<SectionedArtObject>()
 
@@ -85,18 +87,25 @@ class ArtObjectListViewModel @Inject constructor(private val getArtObjectListUse
     }
 
     private fun addArtObjectsIntoSections(pageIndex: Int, addedArtObjects: List<ArtObject>) {
-        if (pageIndex == 0) sectionedArtObjects.clear()
+        if (pageIndex == 0) {
+            sectionedArtObjects.clear()
+            artObjects.clear()
+        }
 
         addedArtObjects.forEach { artObject ->
-            // If the current item's artist name is different, or this is the first item (which guarantees it's a new artist name), add a new section header.
 
-            // Additionally, only add headers if the results are grouped by artists.
+            // If the current item's artist name is different, or this is the first item (which guarantees it's a new artist name), add a new section header.
             if (this.artObjects.isEmpty() || artObject.principalOrFirstMaker != this.artObjects.last().principalOrFirstMaker) {
+
+                // Additionally, only add headers if the results are grouped by artists.
                 if (listOf(SortBy.ARTIST, SortBy.ARTIST_DESC).contains(sortBy.value))
                     sectionedArtObjects.add(SectionedArtObject.ListHeader(artObject.principalOrFirstMaker))
             }
-            sectionedArtObjects.add(SectionedArtObject.ListItem(artObject = artObject))
-            artObjects.add(artObject)
+            if (!artObjectsIds.contains(artObject.id)) {
+                sectionedArtObjects.add(SectionedArtObject.ListItem(artObject = artObject))
+                artObjects.add(artObject)
+                artObjectsIds.add(artObject.id)
+            }
         }
     }
 
